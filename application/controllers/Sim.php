@@ -76,4 +76,91 @@ class Sim extends CI_Controller
         $this->output->set_content_type('application/json')
             ->set_output(json_encode($to_json));
     }
+
+    public function create_bundling()
+    {
+        $sim_card_1 = $this->input->post('sim_card_1');
+        $sim_card_2 = $this->input->post('sim_card_2');
+        $imei_1 = $this->input->post('imei_1');
+        $imei_2 = $this->input->post('imei_2');
+        $brand = $this->input->post('brand');
+
+        $to_json = array();
+        $query = $this->db->query(
+            "SELECT * 
+            FROM bundling 
+            WHERE sim_card_1 = '$sim_card_1'
+            AND sim_card_2 = '$sim_card_2'
+            AND imei_1 = '$imei_1'
+            AND imei_2 = '$imei_2'
+            AND brand = '$brand'
+            "
+        )->result_array();
+        if ($query != null) {
+            $to_json = array(
+                'message' => "duplicate"
+            );
+        } else {
+            $this->db->insert('bundling', array(
+                'sim_card_1' => $sim_card_1,
+                'sim_card_2' => $sim_card_2,
+                'imei_1' => $imei_1,
+                'imei_2' => $imei_2,
+                'brand' => $brand,
+            ));
+            $to_json = array(
+                'message' => "success"
+            );
+        }
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode($to_json));
+    }
+
+    public function check_whitelist()
+    {
+        $input_phone_number_or_imei = $this->input->post('input_phone_number_or_imei');
+        $to_json = array();
+        $query = $this->db->query(
+            "SELECT * 
+            FROM whitelist
+            WHERE phone_number = '$input_phone_number_or_imei'
+            OR imei = '$input_phone_number_or_imei' 
+            "
+        )->result_array();
+        if ($query != null) {
+            $to_json = array(
+                'message' => "success"
+            );
+        } else {
+            $to_json = array(
+                'message' => "not_found"
+            );
+        }
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode($to_json));
+    }
+
+    public function check_blacklist()
+    {
+        $input_phone_number_or_imei = $this->input->post('input_phone_number_or_imei');
+        $to_json = array();
+        $query = $this->db->query(
+            "SELECT * 
+            FROM blacklist
+            WHERE phone_number = '$input_phone_number_or_imei'
+            OR imei = '$input_phone_number_or_imei' 
+            "
+        )->result_array();
+        if ($query != null) {
+            $to_json = array(
+                'message' => "success"
+            );
+        } else {
+            $to_json = array(
+                'message' => "not_found"
+            );
+        }
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode($to_json));
+    }
 }
