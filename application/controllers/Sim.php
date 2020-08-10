@@ -28,6 +28,50 @@ class Sim extends CI_Controller
             ->set_output(json_encode($to_json));
     }
 
+    public function report()
+    {
+        $start = $this->input->get('start');
+        $end = $this->input->get('end');
+        $query_sim_card = $this->db->query(
+            "SELECT * 
+            FROM sim_card 
+            WHERE created_at BETWEEN CAST('$start' as DATE) AND CAST('$end' as DATE)
+            ORDER BY id DESC
+            "
+        )->result_array();
+        $query_sim_card_plus = $this->db->query(
+            "SELECT * 
+            FROM sim_card_plus 
+            WHERE created_at BETWEEN CAST('$start' as DATE) AND CAST('$end' as DATE)
+            ORDER BY id DESC
+            "
+        )->result_array();
+        $query_bundling = $this->db->query(
+            "SELECT * 
+            FROM bundling 
+            WHERE created_at BETWEEN CAST('$start' as DATE) AND CAST('$end' as DATE)
+            ORDER BY id DESC
+            "
+        )->result_array();
+        $to_json = array(
+            'message' => "success",
+            "sim_card" => array(
+                "rows" => count($query_sim_card),
+                "data" => $query_sim_card == null ? null : $query_sim_card
+            ),
+            "sim_card_plus" => array(
+                "rows" => count($query_sim_card_plus),
+                "data" => $query_sim_card_plus == null ? null : $query_sim_card_plus
+            ),
+            "bundling" => array(
+                "rows" => count($query_bundling),
+                "data" => $query_bundling == null ? null : $query_bundling
+            )
+        );
+        $this->output->set_content_type('application/json')
+            ->set_output(json_encode($to_json));
+    }
+
 
     public function create_sim_card()
     {
